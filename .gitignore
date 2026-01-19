@@ -1,0 +1,7 @@
+node_modules/
+.env
+public/generated/*.jpg
+public/generated/*.png
+*.log
+.DS_Store
+

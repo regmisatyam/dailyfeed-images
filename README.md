@@ -229,18 +229,29 @@ dailyfeed-images/
 
 ### Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `PORT` | Server port | `3000` |
-| `UNSPLASH_ACCESS_KEY` | Unsplash API key | *Required* |
-| `ARTICLES_API_URL` | External news API endpoint | `https://dailyfeed.teletechnepal.com/api/articles` |
-| `PUBLIC_BASE_URL` | Public URL for generated images | `http://localhost:3000` |
+| Variable | Description | Default | Required |
+|----------|-------------|---------|----------|
+| `PORT` | Server port | `3000` | No |
+| `UNSPLASH_ACCESS_KEY` | Unsplash API key | - | **Yes** |
+| `DAILYFEED_API_URL` | External news API endpoint | `https://dailyfeed.teletechnepal.com/api/articles` | **Yes** |
+| `PUBLIC_BASE_URL` | Public URL for generated images | `http://localhost:3000` | Local only |
+| `USE_CLOUDINARY` | Enable cloud storage | `false` | **Yes (production)** |
+| `CLOUDINARY_CLOUD_NAME` | Cloudinary cloud name | - | **Yes (production)** |
+| `CLOUDINARY_API_KEY` | Cloudinary API key | - | **Yes (production)** |
+| `CLOUDINARY_API_SECRET` | Cloudinary API secret | - | **Yes (production)** |
 
-### Caching
+### Storage & Caching
 
+#### Local Development
 - **Generated Images**: Cached in `public/generated/` directory
 - **Articles**: Cached in memory for 5 minutes
 - **Cache Strategy**: If image exists, return immediately without regeneration
+
+#### Production (Cloud Storage)
+- **Generated Images**: Stored in Cloudinary (persistent cloud storage)
+- **Image URLs**: Served via Cloudinary CDN (fast global delivery)
+- **Cache Strategy**: Checks Cloudinary for existing images before regenerating
+- **Setup Required**: See [CLOUDINARY_SETUP.md](./CLOUDINARY_SETUP.md)
 
 ## 📦 Dependencies
 
@@ -252,6 +263,7 @@ dailyfeed-images/
 - **dotenv** - Environment variable management
 - **compromise** - Natural language processing
 - **node-cache** - In-memory caching
+- **cloudinary** - Cloud image storage and delivery
 
 ### Development Dependencies
 
@@ -280,22 +292,60 @@ dailyfeed-images/
 
 ## 🚀 Deployment
 
-### Replit
+### ⚠️ Important: Cloud Storage for Production
 
-1. Import this repository to Replit
-2. Set environment variables in Replit Secrets:
+**Platforms like Render, Heroku, and Railway use ephemeral storage** - files saved to disk are deleted on restart or deployment.
+
+**For production, you MUST use Cloudinary for persistent image storage.**
+
+👉 **See [CLOUDINARY_SETUP.md](./CLOUDINARY_SETUP.md) for complete setup instructions**
+
+Quick summary:
+1. Create free Cloudinary account at [cloudinary.com](https://cloudinary.com)
+2. Get your Cloud Name, API Key, and API Secret
+3. Set these environment variables:
+   ```
+   USE_CLOUDINARY=true
+   CLOUDINARY_CLOUD_NAME=your_cloud_name
+   CLOUDINARY_API_KEY=your_api_key
+   CLOUDINARY_API_SECRET=your_api_secret
+   ```
+
+### Render
+
+1. Connect your GitHub repository to Render
+2. Create a new Web Service
+3. Set environment variables:
    - `UNSPLASH_ACCESS_KEY`
-   - `PUBLIC_BASE_URL` (your Replit app URL)
-3. Run the app
+   - `DAILYFEED_API_URL`
+   - `USE_CLOUDINARY=true`
+   - `CLOUDINARY_CLOUD_NAME`
+   - `CLOUDINARY_API_KEY`
+   - `CLOUDINARY_API_SECRET`
+4. Deploy!
 
 ### Heroku
 
 ```bash
 heroku create your-app-name
 heroku config:set UNSPLASH_ACCESS_KEY=your_key
-heroku config:set PUBLIC_BASE_URL=https://your-app-name.herokuapp.com
+heroku config:set USE_CLOUDINARY=true
+heroku config:set CLOUDINARY_CLOUD_NAME=your_cloud_name
+heroku config:set CLOUDINARY_API_KEY=your_api_key
+heroku config:set CLOUDINARY_API_SECRET=your_api_secret
 git push heroku main
 ```
+
+### Replit
+
+1. Import this repository to Replit
+2. Set environment variables in Replit Secrets:
+   - `UNSPLASH_ACCESS_KEY`
+   - `USE_CLOUDINARY=true`
+   - `CLOUDINARY_CLOUD_NAME`
+   - `CLOUDINARY_API_KEY`
+   - `CLOUDINARY_API_SECRET`
+3. Run the app
 
 ### Docker
 

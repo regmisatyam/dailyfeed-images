@@ -1,7 +1,7 @@
 import express from 'express';
 import { generateNewsImage } from '../services/imageGenerator.js';
 import { getArticleById } from '../services/articleFetcher.js';
-import { checkImageExists } from '../utils/fileUtils.js';
+import { checkImageExists, getImageUrl } from '../utils/fileUtils.js';
 
 const router = express.Router();
 
@@ -28,7 +28,7 @@ router.get('/', async (req, res, next) => {
       console.log(`✅ Cache hit for article ${articleId}`);
       return res.json({
         id: articleId,
-        url: `${process.env.PUBLIC_BASE_URL}/generated/news_${articleId}.jpg`
+        url: getImageUrl(articleId)
       });
     }
 
@@ -47,7 +47,7 @@ router.get('/', async (req, res, next) => {
     // Return response
     res.json({
       id: articleId,
-      url: `${process.env.PUBLIC_BASE_URL}/generated/news_${articleId}.jpg`
+      url: getImageUrl(articleId)
     });
 
   } catch (error) {
